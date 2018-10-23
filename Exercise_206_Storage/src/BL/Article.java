@@ -1,6 +1,8 @@
 package BL;
 
-public class Article {
+import java.io.Serializable;
+
+public class Article implements Serializable{
     private int id;
     private String desc;
     private int amount;
@@ -13,12 +15,20 @@ public class Article {
         this.place = place;
     }
     
-    public void buy(){
-        amount ++;
+    public void buy() throws Exception{
+        if(amount < 75){
+            amount ++;
+        }else{
+            throw new Exception("You cannot have more than 75!");
+        }
     }
     
-    public void sell(){
-        amount --;
+    public void sell() throws Exception{
+        if(amount > 0){
+            amount --;
+        }else{
+            throw new Exception("You cannot have -1!");
+        }
     }
 
     public int getId() {

@@ -2,15 +2,28 @@ package GUI;
 
 import BL.TableModel;
 import BL.TableRenderer;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 public class StorageGUI extends javax.swing.JFrame {
     private TableModel model = new TableModel();
     private TableRenderer renderer = new TableRenderer();
+    private File f = new File("src\\data.bin");
     
-    public StorageGUI() {
+    public StorageGUI() throws IOException, FileNotFoundException, ClassNotFoundException {
         initComponents();
         table.setModel(model);
-        table.setDefaultRenderer(Object.class, renderer);        
+        table.setDefaultRenderer(Object.class, renderer);
+        
+        try{
+            model.load(f);
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, "Load error!");
+        }
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -28,6 +41,11 @@ public class StorageGUI extends javax.swing.JFrame {
         miSell = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -128,14 +146,30 @@ public class StorageGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_miEditActionPerformed
 
     private void miBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miBuyActionPerformed
-        model.getArticles().get(table.getSelectedRow()).buy();
+        try {
+            model.getArticles().get(table.getSelectedRow()).buy();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        }
         model.fireTableDataChanged();
     }//GEN-LAST:event_miBuyActionPerformed
 
     private void miSellActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSellActionPerformed
-        model.getArticles().get(table.getSelectedRow()).sell();
+        try {
+            model.getArticles().get(table.getSelectedRow()).sell();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        }
         model.fireTableDataChanged();
     }//GEN-LAST:event_miSellActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        try {
+            model.safe(f);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Safe error!");
+        }
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
@@ -167,7 +201,13 @@ public class StorageGUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new StorageGUI().setVisible(true);
+                try {
+                    new StorageGUI().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(StorageGUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(StorageGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
